@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chương trình xét học lực</title>
+</head>
+<body>
+
+    <h1>CHƯƠNG TRÌNH XÉT HỌC LỰC</h1>
+
+    <form id="formHocLuc">
+
+        <label>Chọn năm học:</label>
+        <select name="year" id="year">
+            <option value="">-- Chọn năm --</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
+
+        <p id="errYear" style="color:red"></p>
+
+        <label>Điểm học kỳ 1:</label>
+        <input type="number" name="diem1" id="diem1"
+               min="0" max="10" step="0.1">
+        <p id="errDiem1" style="color:red"></p>
+
+        <label>Điểm học kỳ 2:</label>
+        <input type="number" name="diem2" id="diem2"
+               min="0" max="10" step="0.1">
+        <p id="errDiem2" style="color:red"></p>
+
+        <label>Email:</label>
+        <input type="text" name="email" id="email">
+        <p id="errEmail" style="color:red"></p>
+
+        <br>
+
+        <button type="submit">Xét học lực</button>
+        <button type="reset" id="btnReset">Làm lại</button>
+
+    </form>
+
+    <div id="ketQua"></div>
+
+    <script>
+        const form = document.getElementById("formHocLuc");
+        const ketQua = document.getElementById("ketQua");
+
+        form.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const formData = new FormData(form);
+
+            fetch("xuly.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+
+                // Xóa lỗi cũ
+                document.getElementById("errYear").innerHTML = "";
+                document.getElementById("errDiem1").innerHTML = "";
+                document.getElementById("errDiem2").innerHTML = "";
+                document.getElementById("errEmail").innerHTML = "";
+                ketQua.innerHTML = "";
+
+                // Tạo vùng tạm để đọc dữ liệu PHP trả về
+                const temp = document.createElement("div");
+                temp.innerHTML = data;
+
+                // Đưa thông báo lỗi về đúng ô
+                document.getElementById("errYear").innerHTML =
+                    temp.querySelector("#errYear")?.innerHTML || "";
+
+                document.getElementById("errDiem1").innerHTML =
+                    temp.querySelector("#errDiem1")?.innerHTML || "";
+
+                document.getElementById("errDiem2").innerHTML =
+                    temp.querySelector("#errDiem2")?.innerHTML || "";
+
+                document.getElementById("errEmail").innerHTML =
+                    temp.querySelector("#errEmail")?.innerHTML || "";
+
+                // Hiển thị kết quả
+                const result = temp.querySelector("#result");
+                if (result) {
+                    ketQua.innerHTML = result.innerHTML;
+                }
+
+            })
+            .catch(error => {
+                ketQua.innerHTML = "Không thể kết nối đến PHP!";
+                console.log(error);
+            });
+        });
+
+        // Reset form và xóa thông báo
+        document.getElementById("btnReset").addEventListener("click", function() {
+            document.getElementById("errYear").innerHTML = "";
+            document.getElementById("errDiem1").innerHTML = "";
+            document.getElementById("errDiem2").innerHTML = "";
+            document.getElementById("errEmail").innerHTML = "";
+            ketQua.innerHTML = "";
+        });
+    </script>
+
+</body>
+</html>
